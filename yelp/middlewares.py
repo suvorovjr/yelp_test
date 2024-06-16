@@ -3,6 +3,8 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import random
+from w3lib.http import basic_auth_header
 from scrapy import signals
 
 # useful for handling different item types with a single interface
@@ -101,3 +103,25 @@ class YelpDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+
+class RandomProxyMiddleware(object):
+    def __init__(self):
+        self.proxies = []
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
+        return middleware
+
+    def spider_opened(self, spider):
+        with open(spider.settings.get('PROXY_LIST')) as file:
+            self.proxies = [line.strip() for line in file]
+
+    def process_request(self, request, spider):
+        if self.proxies:
+            proxy = random.choice(self.proxies)
+            proxy_url, proxy_port, proxy_login, proxy_pass = proxy.split(':')
+            request.meta['proxy'] = f"http://{proxy_url}:{proxy_port}"
+            request.headers['Proxy-Authorization'] = basic_auth_header(proxy_login, proxy_pass)
