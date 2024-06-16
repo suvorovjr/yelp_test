@@ -106,6 +106,10 @@ class YelpDownloaderMiddleware:
 
 
 class RandomProxyMiddleware(object):
+    """
+    Мидлвар для применения прокси для запросов
+    """
+
     def __init__(self):
         self.proxies = []
 
