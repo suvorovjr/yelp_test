@@ -153,5 +153,4 @@ class RandomUserAgentMiddleware:
     def process_request(self, request, spider):
         fingerprint: ChromeFingerprint = self.chrome_fp.get_fingerprint()
         user_agent = fingerprint.navigator.user_agent
-        print(user_agent)
         request.headers['User-Agent'] = user_agent
