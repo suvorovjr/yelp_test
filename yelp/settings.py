@@ -58,7 +58,8 @@ CONCURRENT_REQUESTS_PER_IP = 10
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   "yelp.middlewares.RandomProxyMiddleware": 543,
+    "yelp.middlewares.RandomProxyMiddleware": 543,
+    "yelp.middlewares.RandomUserAgentMiddleware": 543,
 }
 
 # Enable or disable extensions

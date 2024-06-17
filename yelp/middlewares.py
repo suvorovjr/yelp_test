@@ -4,6 +4,8 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 import random
+import asyncio
+from chrome_fingerprints.fingerprints import FingerprintGenerator, ChromeFingerprint
 from w3lib.http import basic_auth_header
 from scrapy import signals
 
@@ -129,3 +131,23 @@ class RandomProxyMiddleware(object):
             proxy_url, proxy_port, proxy_login, proxy_pass = proxy.split(':')
             request.meta['proxy'] = f"http://{proxy_url}:{proxy_port}"
             request.headers['Proxy-Authorization'] = basic_auth_header(proxy_login, proxy_pass)
+
+
+class RandomUserAgentMiddleware:
+    def __init__(self):
+        self.chrome_fp = FingerprintGenerator()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
+        return middleware
+
+    def spider_opened(self, spider):
+        spider.logger.info('Spider opened: %s' % spider.name)
+
+    def process_request(self, request, spider):
+        fingerprint: ChromeFingerprint = self.chrome_fp.get_fingerprint()
+        user_agent = fingerprint.navigator.user_agent
+        print(user_agent)
+        request.headers['User-Agent'] = user_agent
