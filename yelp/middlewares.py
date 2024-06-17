@@ -134,6 +134,10 @@ class RandomProxyMiddleware(object):
 
 
 class RandomUserAgentMiddleware:
+    """
+    Мидлвар для применения отпечатка браузера для запросов
+    """
+
     def __init__(self):
         self.chrome_fp = FingerprintGenerator()
 
